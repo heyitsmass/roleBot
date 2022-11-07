@@ -1,6 +1,12 @@
-# File types 
+# Dependency file types 
 *.token
 *.txt
 *.json
+
+# MacOS Specific files 
+.DS_Store
+
+# Pycache 
+__pycache__ 
 
 
