@@ -67,29 +67,6 @@ async def _assign(interaction:discord.Interaction):
   else: 
     await interaction.response.send_message(content="There exist no assignable roles.", ephemeral=True) 
 
-@bot.tree.command(name='remove', description='Display roles you can be removed from.') 
-async def _remove(interaction:discord.Interaction): 
-  db = Database(interaction.guild_id) 
-
-  if db['emoji_links'].keys(): 
-    ids = list(r.id for r in interaction.user.roles) 
-    view = discord.ui.View() 
-
-    for emoji in db['emoji_links']: 
-      if db['emoji_links'][emoji] in ids: 
-        role = interaction.guild.get_role(db['emoji_links'][emoji]) 
-        button = roleButton(role, interaction.user.remove_roles, remove=True) 
-        view.add_item(button) 
-      
-    if view.children: 
-      await interaction.response.send_message(view=view, ephemeral=True) 
-    else: 
-      await interaction.response.send_message(content="You're not assigned to any roles.", ephemeral=True)
-
-  else: 
-    # no emoji links 
-    await interaction.response.send_message(content="There exist no removable roles.", ephemeral=True) 
-
 @bot.tree.command(description="Exclude roles from list.") 
 async def exclude(inter:discord.Interaction, role_name:str):
   if not inter.user.guild_permissions.administrator: 
