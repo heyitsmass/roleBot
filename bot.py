@@ -1,17 +1,21 @@
 from config import Token, Database
-from typing import Awaitable
 import discord 
 from discord.ext import commands 
-
-class myClient(commands.Bot): 
-  async def on_ready(self):
+import os 
+class cBot(commands.Bot): 
+  async def on_ready(self): 
     await self.tree.sync()
     print(f'Logged in as {self.user}')
-    game = discord.Activity(name="/roles to set roles!", type=3)
-    await self.change_presence(status = discord.Status.online, activity=game)
-
+  
   async def on_guild_join(self, guild:discord.Guild): 
-    Database(guild.id) 
+    print(f'Joined {guild.name}')
+    if not os.path.isdir('database'): 
+      raise RuntimeError(f'Missing database directory.') 
+    loc = f'database/{guild.id}.json'
+    db = {} 
+    db['exclusions'] = []
+    json.dump(db, open(loc, 'x')) 
+    print(f'created db @ {loc}')
 
 class rButton(discord.ui.Button):
   def __init__(self, role:discord.Role, remove:bool=False, **args): 
@@ -46,7 +50,7 @@ intents.message_content = True
 intents.reactions = True 
 intents.members = True 
 
-bot = myClient(intents=intents, command_prefix='$') 
+bot = cBot(intents=intents, command_prefix='$')
 
 @bot.tree.command(description='Display roles available for assignment or removal.') 
 async def roles(inter:discord.Interaction):
