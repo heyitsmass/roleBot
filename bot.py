@@ -2,6 +2,23 @@ from config import Token, Database
 import discord 
 from discord.ext import commands 
 import os 
+import json 
+
+import argparse 
+
+parser = argparse.ArgumentParser(
+  prog = "roleBot", 
+  description= "Lightweight 'display' role manager for Discord." 
+)
+parser.add_argument(
+  '-t', '--token', action='store', required=False
+)
+args = parser.parse_args()
+
+if args.token: 
+  token = Token(args.token) 
+else: 
+  token = Token() 
 class cBot(commands.Bot): 
   async def on_ready(self): 
     await self.tree.sync()
@@ -104,6 +121,6 @@ async def exclude(inter:discord.Interaction, role_name:str):
 
   await inter.response.send_message(content=_str, ephemeral=True) 
 
-bot.run(Token()) 
+bot.run(token) 
 
 
