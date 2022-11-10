@@ -13,30 +13,33 @@ class myClient(commands.Bot):
   async def on_guild_join(self, guild:discord.Guild): 
     Database(guild.id) 
 
-
-class roleButton(discord.ui.Button): 
-  def __init__(self, role:discord.Role, func:Awaitable[discord.Role], _emoji:str='💀', remove=False): 
-    super().__init__(label=role.name, style=discord.ButtonStyle.green)
+class rButton(discord.ui.Button):
+  def __init__(self, role:discord.Role, remove:bool=False, **args): 
     self.role = role 
-    self.func = func 
     self.remove = remove
-  
-  async def callback(self, interaction:discord.Interaction): 
-    await self.func(self.role) 
-    super().view.remove_item(self) 
+    if self.remove: 
+      args['style'] = discord.ButtonStyle.red
+    else: 
+      args['style'] = discord.ButtonStyle.green
 
-    if super().view.children: 
-      _str = 'assigned to'
-      if not self.remove: 
-        _str = 'removed to'
-      await interaction.response.edit_message(content=f'You were {_str} {self.role.name}', view=super().view) 
+    if 'disabled' in args.keys(): 
+      args['style'] = discord.ButtonStyle.grey
 
-    else:
-      _str = 'removed' 
-      if not self.remove: 
-        _str = 'assigned'
-       
-      await interaction.response.edit_message(content=f'You\'ve been {_str} from all available roles!', view=super().view)
+    super().__init__(**args) 
+
+  async def callback(self, inter:discord.Interaction): 
+    if not self.remove: 
+      self.remove = True 
+      self.style = discord.ButtonStyle.red 
+      content = f'You were added to {self.role.name}'
+      await inter.user.add_roles(self.role) 
+    else: 
+      self.remove = False 
+      self.style = discord.ButtonStyle.green
+      content = f'You were removed from {self.role.name}' 
+      await inter.user.remove_roles(self.role) 
+    
+    await inter.response.edit_message(content=content, view=super().view)
 
 intents = discord.Intents.default() 
 intents.message_content = True 
