@@ -90,49 +90,23 @@ async def _remove(interaction:discord.Interaction):
     # no emoji links 
     await interaction.response.send_message(content="There exist no removable roles.", ephemeral=True) 
 
-@bot.tree.command(name='assign', description='Link an emoji to a role.') 
-async def _assign(interaction:discord.Interaction, emoji:str, role_name:str): 
-  db = Database(interaction.guild_id) 
-  ids = db['emoji_links'].values() 
-
-  if emoji not in db['emoji_links'].keys(): 
-    #emoji can be linked 
-    found = False 
-    for r in interaction.guild.roles: 
-      if r.name.lower() == role_name.lower(): 
-        found = True 
-        if r.id in ids: 
-          await interaction.response.send_message('Role is assigned to another emoji.', ephemeral=True)
-        else: 
-          db['emoji_links'][emoji] = r.id 
-          await interaction.response.send_message(f'{r.name} linked to {emoji}', ephemeral=True)
-        break 
-    
-    if not found: 
-        await interaction.response.send_message(f'{role_name} does not exist in this guild.', ephemeral=True)
-
-  else: 
-    #emoji linked to another role
-    role = interaction.guild.get_role(db['emoji_links'][emoji]) 
-    await interaction.response.send_message(f'{emoji} is already linked to {role.name}', ephemeral=True)
-
-@bot.tree.command(name='reassign', description='Relink a role to a new emoji.') 
-async def _reassign(interaction:discord.Interaction, role_name:str, emoji_new:str): 
-  role = next(filter(lambda i: i.name.lower() == role_name.lower(), interaction.guild.roles), None )
-
-  if role: 
-    db = Database(interaction.guild_id) 
-    for emoji in db['emoji_links']: 
-      if db['emoji_links'][emoji] == role.id: 
-        del db['emoji_links'][emoji] 
-        break 
-
-    db['emoji_links'][emoji_new] = role.id 
-    await interaction.response.send_message(f'{role.name} reassigned to {emoji_new}.', ephemeral=True) 
-
-  else: 
-    await interaction.response.send_message(f'{role_name} is not a role.', ephemeral=True) 
+@bot.tree.command(description="Exclude roles from list.") 
+async def exclude(inter:discord.Interaction, role_name:str):
+  if not inter.user.guild_permissions.administrator: 
+    await inter.response.send_message(content="*You do not have permission to execute this command. Contact the server owner.*", ephemeral=True)
+    return 
+  role = next(filter(lambda i: i.name.lower() == role_name.lower(), inter.guild.roles), None )
   
+  db:list = Database(inter.guild_id) 
+  if role.id not in db['exclusions']: 
+    db['exclusions'].append(role.id)
+    _str = f'{role.name} added to exclusions.'  
+  else: 
+    db['exclusions'].remove(role.id) 
+    _str = f'{role.name} removed from exclusions.' 
+
+  await inter.response.send_message(content=_str, ephemeral=True) 
+
 bot.run(Token()) 
 
 
