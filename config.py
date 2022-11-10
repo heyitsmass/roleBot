@@ -2,41 +2,33 @@ import os
 import json 
 import time 
 
-class MissingTokenError(Exception): 
-  def __str__(self): 
-    return f'Enter secret API token into \'dependencies/token/secret.token\''
+class MissingSecretTokenError(Exception): 
+  def __init__(self, loc:str=''): 
+    self.loc = loc 
 
+  def __str__(self): 
+    return f'\n\tInput a secret API token into \'{self.loc}\' or initialize with Token(\'<secret>\')'
 class Token(str): 
-  '''
-    Gathers a token from the dependency file. 
-
-    Creates a token file if unavailable. 
-
-    Location: dependencies/token/secret.token
-
-    Parameters: 
-      token:str
-        -> Optional, Token to be written to new file.
-
-        -> Ignored if the file already exists or not provided. 
-  '''
-  def __init__(self, token:str=''): 
-    self.__loc = 'dependencies/token/secret.token' 
-    self.__token = token 
-    if not os.path.isfile(self.__loc): 
-      file = open(self.__loc, 'x')
-      if self.__token: 
-        file.write(self.__token)
-        file.close() 
-      else: 
-        raise MissingTokenError
+  def __new__(self, token:str=''):
+    loc, mode = 'requirements/secret.token', 'r'
+    if not os.path.isfile(loc): 
+      mode = 'x' 
     else: 
-      self.__token = open(self.__loc, 'r').read()
-      if not self.__token: 
-        raise MissingTokenError
-      
-  def __str__(self): 
-    return self.__token 
+      if token: 
+        mode = 'w' 
+
+    file = open(loc, mode) 
+
+    if mode in ['x', 'w']: 
+      with file: 
+        file.write(token) 
+
+    else: 
+      token = file.read() 
+      if not token: 
+        raise MissingSecretTokenError(loc) 
+
+    return super().__new__(self, token) 
 
 
 class Database:
