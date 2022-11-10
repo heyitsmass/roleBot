@@ -39,3 +39,20 @@ server_role_names = [
      "lower 4" 
  ] 
  ```
+
+## Installation instructions
+
+If you would like to use this bot personally, feel free to download the source 
+
+### Linux (Ubuntu) & MacOS 
+
+    pip3 -m install discord 
+    
+    git clone https://github.com/heyitsmass/roleBot 
+    
+    cd roleBot 
+    
+    mkdir database requirements 
+    
+    python3 bot.py -t <discord_API_token> 
+    
