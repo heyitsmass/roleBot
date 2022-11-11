@@ -3,9 +3,19 @@
 ### [Invite this bot your server!](https://discord.com/api/oauth2/authorize?client_id=1033204323586416700&permissions=8&scope=bot)
 roleBot is an open-source role management bot for discord community servers! 
 
-roleBot autogathers any role below it's own rank, ignoring user exclusions and displays them as a clickable button for users to assign or remove themselves. 
+roleBot autogathers any role below it's own rank, ignoring user exclusions and displays them as a clickable button for users to assign or remove themselves. Any role ranked above the bot in the server settings cannot is not assignable.
 
-![img](https://i.imgur.com/0d1CukD.png)
+## /exclude 
+### Administrator only! Red is already excluded, Green can be excluded.
+![img](https://i.gyazo.com/2447030ba54174175bd46b608c0f61b1.png)
+
+## /roles 
+### Non-Administrator invocation! Red is removable, Green is assignable, Grey is excluded.
+![img](https://i.gyazo.com/c367f9c1abee9415e884104acef2e021.png)
+
+### Administrator invocation! All roles are assignable!
+![img](https://i.gyazo.com/f257d66f3ec155d44f1ed092d328cd8b.png)
+
 
 ### Purpose: 
 
