@@ -50,7 +50,7 @@ server_role_names = [
     "FPS Player", 
     "MMO Gamer", 
     "Card Enthusiant", 
-    "Board Gamer",
+    "Board Gamer"
  ] 
  ```
 
