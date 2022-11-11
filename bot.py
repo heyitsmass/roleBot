@@ -97,35 +97,36 @@ bot = cBot(intents=intents, command_prefix='$')
 @bot.tree.command(description='Display roles available for assignment or removal.') 
 async def roles(inter:discord.Interaction):
   # Displays a list of assignable roles. 
-  db = Database(inter.guild_id)
+  db = Database(inter.guild_id, mode='r')
   exclusions = db['exclusions']
-  user = inter.guild.get_member(bot.user.id)
+  self = inter.guild.get_member(bot.user.id)
   user_role_ids = list(role.id for role in inter.user.roles) 
 
   view = discord.ui.View()
   #button = rButton(inter.user.roles[0], False, label="hello")
   for role in inter.guild.roles: 
-    if role == user.top_role: 
+    if role == self.top_role: 
       # roles above this are not assignable by the bot.
       # we can consider adding any roles at or above this unassignable and could add a disabled button
-      break 
+      break   
     elif role.name == '@everyone': 
       # everyone is already assigned to this role.
       continue 
-  
-    if role.id not in exclusions: 
+    
+    if role.id not in exclusions or inter.user.guild_permissions.administrator: 
       #role is assignable 
       #check if the user is assigned to the role 
       if role.id in user_role_ids: 
         #user is already assigned to the role, switch the button type to remove
-        view.add_item(rButton(role, True, label=role.name)) 
+        view.add_item(_Button(role, True, label=role.name)) 
       else:  
         #user is not assigned to the sole, switch the button type to assign 
-        view.add_item(rButton(role, label=role.name)) 
+        view.add_item(_Button(role, label=role.name)) 
         
     else: 
       #disable the button entirely. 
-      view.add_item(rButton(role, label=role.name, disabled=True))
+      view.add_item(_Button(role, label=role.name, disabled=True)) 
+
   
   await inter.response.send_message(content="Available roles", view=view, ephemeral=True) 
   
