@@ -131,21 +131,33 @@ async def roles(inter:discord.Interaction):
   await inter.response.send_message(content="Available roles", view=view, ephemeral=True) 
   
 @bot.tree.command(description="Exclude roles from list.") 
-async def exclude(inter:discord.Interaction, role_name:str):
+async def exclude(inter:discord.Interaction):
   if not inter.user.guild_permissions.administrator: 
     await inter.response.send_message(content="*You do not have permission to execute this command. Contact the server owner.*", ephemeral=True)
     return 
-  role = next(filter(lambda i: i.name.lower() == role_name.lower(), inter.guild.roles), None )
   
-  db:list = Database(inter.guild_id) 
-  if role.id not in db['exclusions']: 
-    db['exclusions'].append(role.id)
-    _str = f'{role.name} added to exclusions.'  
-  else: 
-    db['exclusions'].remove(role.id) 
-    _str = f'{role.name} removed from exclusions.' 
+  db = Database(inter.guild_id, mode='r')  
+  exclusions = db['exclusions'] 
+  self = inter.guild.get_member(bot.user.id)
+  view = discord.ui.View()
 
-  await inter.response.send_message(content=_str, ephemeral=True) 
+  for role in inter.guild.roles:
+    if role == self.top_role: 
+      # roles above this are not assignable by the bot.
+      # we can consider adding any roles at or above this unassignable and could add a disabled button
+      break 
+    elif role.name == '@everyone': 
+      # everyone is already assigned to this role.
+      continue   
+
+    if role.id not in exclusions:
+      # role can be excluded
+      view.add_item(_Button(role, exclude=True, label=role.name)) 
+    else:  
+      #user is not assigned to the sole, switch the button type to assign 
+      view.add_item(_Button(role, remove=True, exclude=True, label=role.name))
+      
+  await inter.response.send_message(content="Excludable roles.", view=view, ephemeral=True) 
 
 bot.run(token) 
 
