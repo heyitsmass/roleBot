@@ -22,6 +22,12 @@ else:
 class cBot(commands.Bot): 
   async def on_ready(self): 
     await self.tree.sync()
+    await self.change_presence(
+      activity = discord.Activity(
+        type=discord.ActivityType.listening, 
+        name="/roles to set roles!"
+        )
+      )
     print(f'Logged in as {self.user}')
   
   async def on_guild_join(self, guild:discord.Guild): 
