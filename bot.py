@@ -40,10 +40,14 @@ class cBot(commands.Bot):
     json.dump(db, open(loc, 'x')) 
     print(f'created db @ {loc}')
 
-class rButton(discord.ui.Button):
-  def __init__(self, role:discord.Role, remove:bool=False, **args): 
+class _Button(discord.ui.Button):
+  def __init__(self, role:discord.Role, remove:bool=False, exclude:bool=False, **args): 
     self.role = role 
     self.remove = remove
+    self.role_name = role.name
+    self.role_id = role.id 
+    self.exclude = exclude  
+
     if self.remove: 
       args['style'] = discord.ButtonStyle.red
     else: 
@@ -54,19 +58,34 @@ class rButton(discord.ui.Button):
 
     super().__init__(**args) 
 
-  async def callback(self, inter:discord.Interaction): 
-    if not self.remove: 
-      self.remove = True 
-      self.style = discord.ButtonStyle.red 
-      content = f'You were added to {self.role.name}'
-      await inter.user.add_roles(self.role) 
+  async def callback(self, inter:discord.Interaction):
+    if self.exclude: 
+      db:dict = Database(inter.guild_id) 
+      if self.remove:
+        self.remove = False 
+        db['exclusions'].remove(self.role_id) 
+        content = f'{self.role_name} was removed from the exclusions list'
+        self.style = discord.ButtonStyle.green 
+      else: 
+        self.remove = True 
+        db['exclusions'].append(self.role_id) 
+        content = f'{self.role_name} was added to the exclusions list'
+        self.style = discord.ButtonStyle.red 
+      
+      await inter.response.edit_message(content=content, view=super().view) 
     else: 
-      self.remove = False 
-      self.style = discord.ButtonStyle.green
-      content = f'You were removed from {self.role.name}' 
-      await inter.user.remove_roles(self.role) 
+      if not self.remove: 
+        self.remove = True 
+        self.style = discord.ButtonStyle.red 
+        content = f'You were added to {self.role.name}'
+        await inter.user.add_roles(self.role) 
+      else: 
+        self.remove = False 
+        self.style = discord.ButtonStyle.green
+        content = f'You were removed from {self.role.name}' 
+        await inter.user.remove_roles(self.role) 
     
-    await inter.response.edit_message(content=content, view=super().view)
+      await inter.response.edit_message(content=content, view=super().view)
 
 intents = discord.Intents.default() 
 intents.message_content = True 
