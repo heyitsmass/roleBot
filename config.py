@@ -32,14 +32,16 @@ class Token(str):
 
 
 class Database(dict): 
-  def __init__(self, guild_id:int): 
+  def __init__(self, guild_id:int, mode:str='w'): 
     self.loc:str = f'database/{guild_id}.json'
     self.db:dict = json.load(open(self.loc, 'r')) 
-    self.file = open(self.loc, 'w')
+    self.file = open(self.loc, mode)
+    self.mode = mode 
 
   def __del__(self): 
-    json.dump(self.db, self.file) 
-    print("Db closed.") 
+    if self.mode == 'w': 
+      json.dump(self.db, self.file) 
+      print("Db closed.") 
 
   def __getitem__(self, __key): 
     return self.db[__key] 
@@ -60,7 +62,10 @@ class Database(dict):
     return self.db.values() 
 
   def items(self): 
-    return self.db.items() 
+    return self.db.items()
+
+  def get(self, __key): 
+    return self.db.get(__key)  
 
 
 
