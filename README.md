@@ -29,26 +29,28 @@ roleBot gives server users the ability to do this, without incurring extensive o
 
 # all available server roles 
 server_role_names = [
-    "lower 1" 
-    "lower 2" 
-    "lower 3" 
-    "lower 4" 
-    "roleBot"
-    "@everyone" 
-    "moderator" 
+    "FPS Player", 
+    "MMO Gamer", 
+    "Card Enthusiant", 
+    "Board Gamer",
+    "Super Secret Role",
+    "roleBot",
+    "@everyone", 
+    "moderator", 
     "administrator" 
  } 
  
  # user defined exclusions
  exclusion_names = [ 
-    "lower 2" 
+    "Super Secret Role" 
  ]
  
  # roles gathered by the bot 
  available_roles = [ 
-     "lower 1" 
-     "lower 3" 
-     "lower 4" 
+    "FPS Player", 
+    "MMO Gamer", 
+    "Card Enthusiant", 
+    "Board Gamer",
  ] 
  ```
 
