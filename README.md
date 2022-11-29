@@ -1,6 +1,9 @@
 # roleBot
 
-### [Invite this bot your server!](https://discord.com/api/oauth2/authorize?client_id=1033204323586416700&permissions=8&scope=bot)
+## ~~Invite this bot your server!~~
+
+## As of December 2022, Discord has implemented features that render this bot obsolete
+
 roleBot is an open-source role management bot for discord community servers! 
 
 roleBot autogathers any role below it's own rank, ignoring user exclusions and displays them as a clickable button for users to assign or remove themselves. Any role ranked above the bot in the server settings cannot is not assignable.
